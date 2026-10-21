@@ -1,0 +1,42 @@
+# Cau hinh application
+app:
+  name: NMK-chatbot-app
+  version: 1.0.0-beta
+  env: production
+
+# Cau hinh duong dan data
+data:
+  raw_dir: data/raw
+  processed_dir: data/processed
+
+# Cau hinh embedding
+embedding:
+  model: intfloat/multilingual-e5-small
+  batch_size: 32
+  device: cpu
+
+# Cau hinh vector database luu tru chunk + embedding
+vector_database:
+  type: qdrant
+  host: localhost
+  port: 6333
+  url: http://localhost:6333   # optional, ưu tiên url nếu có
+  api_key: null               # nếu dùng Qdrant Cloud
+  collection_name: nmk_chatbot_collection
+  distance: cosine            # cosine | dot | euclid - cosine similarity. cos(0) = 100%, cos(90) = 0
+  vector_size: 384
+  timeout: 30                 # connection timeout in seconds
+
+# Cau hinh model LLM
+llm:
+  provider: ollama
+  model_name: qwen2.5:3b
+  base_url: http://localhost:11434
+  temperature: 0.2            # do sang tao cua cau tra loi
+  max_tokens: 512             # Giảm từ 1024 → 512 để nhanh hơn, token dung de gioi han do dai cau tra loi
+  timeout: 60                 # request timeout in seconds
+
+# Cau hinh RAG
+retrieval:
+  top_k: 5 # so luong chunk lay ve de dung lam context cho LLM
+  score_threshold: 0.4 # sau khi tinh cosine similarity thi chi lay nhung chunk co diem so tren nguong nay
