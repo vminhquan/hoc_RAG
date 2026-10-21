@@ -11,7 +11,7 @@ data:
 
 # Cau hinh embedding
 embedding:
-  model: intfloat/multilingual-e5-small
+  model: text-embedding-3-small
   batch_size: 32
   device: cpu
 
@@ -24,14 +24,14 @@ vector_database:
   api_key: null               # nếu dùng Qdrant Cloud
   collection_name: nmk_chatbot_collection
   distance: cosine            # cosine | dot | euclid - cosine similarity. cos(0) = 100%, cos(90) = 0
-  vector_size: 384
+  vector_size: 1536           # text-embedding-3-small = 1536 chieu
   timeout: 30                 # connection timeout in seconds
 
 # Cau hinh model LLM
 llm:
-  provider: ollama
-  model_name: qwen2.5:3b
-  base_url: http://localhost:11434
+  provider: openai
+  model_name: gpt-4o-mini
+  base_url: https://api.openai.com/v1
   temperature: 0.2            # do sang tao cua cau tra loi
   max_tokens: 512             # Giảm từ 1024 → 512 để nhanh hơn, token dung de gioi han do dai cau tra loi
   timeout: 60                 # request timeout in seconds

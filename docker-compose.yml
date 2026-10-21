@@ -1,0 +1,63 @@
+name: nmk-chatbot
+
+services:
+  # Vector database (config/settings.yaml -> vector_database)
+  qdrant:
+    image: qdrant/qdrant:v1.12.4
+    container_name: nmk-qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"   # REST API + dashboard: http://localhost:6333/dashboard
+      - "6334:6334"   # gRPC
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:-}
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Ingestion pipeline: chunk data/processed -> embed -> upsert vao Qdrant
+  # Chay: docker compose --profile ingest run --rm ingest
+  ingest:
+    build: .
+    image: nmk-chatbot-app:latest
+    container_name: nmk-ingest
+    profiles: ["ingest"]
+    command: ["python", "-m", "ingestion.pipeline"]
+    env_file: .env
+    environment:
+      # Ghi de QDRANT_URL trong .env (localhost) -> ten service trong network
+      QDRANT_URL: http://qdrant:6333
+    volumes:
+      - ./config:/app/config:ro
+      - ./data:/app/data:ro
+      - ./logs:/app/logs
+    depends_on:
+      qdrant:
+        condition: service_healthy
+
+  # Chatbot CLI
+  # Chay: docker compose --profile chat run --rm chat
+  chat:
+    image: nmk-chatbot-app:latest
+    build: .
+    container_name: nmk-chat
+    profiles: ["chat"]
+    command: ["python", "chat.py"]
+    stdin_open: true
+    tty: true
+    env_file: .env
+    environment:
+      QDRANT_URL: http://qdrant:6333
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+    depends_on:
+      qdrant:
+        condition: service_healthy
+
+volumes:
+  qdrant_data:

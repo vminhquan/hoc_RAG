@@ -4,28 +4,24 @@ python-dotenv>=1.2.3
 tqdm>=4.70.1
 numpy>=2.4.6
 requests>=2.34.2
+altair
+importlib-metadata
 
 # ===== LangChain =====
 langchain-core>=1.6.3
 langchain-community>=0.4.2
 langchain-text-splitters>=1.1.2
 langchain-openai>=1.6.2
-langchain-ollama
 langchain-qdrant
-langchain-huggingface
 
 # ===== Document Loading =====
 unstructured[pdf]>=0.27.6
 pypdf>=6.19.0
 
-# ===== Embedding =====
-sentence-transformers
-transformers>=5.17.0
-torch>=2.14.0
-
 # ===== Vector Database =====
 qdrant-client
 faiss-cpu>=1.15.1
 
-# ===== LLM =====
-ollama
+# ===== LLM & Embedding (OpenAI) =====
+openai
+tiktoken
