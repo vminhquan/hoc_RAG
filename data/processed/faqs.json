@@ -1,0 +1,17 @@
+[
+    {
+        "id": 1,
+        "question": "Công ty có hỗ trợ xin giấy phép xây dựng không?",
+        "answer": "Có. Khi ký hợp đồng thiết kế, công ty hỗ trợ chuẩn bị hồ sơ và thủ tục xin giấy phép xây dựng cho khách hàng."
+    },
+    {
+        "id": 2,
+        "question": "Thời gian thi công một căn nhà phố mất bao lâu?",
+        "answer": "Thời gian thi công nhà phố 3 tầng thường từ 4 đến 6 tháng, tùy diện tích và điều kiện thời tiết."
+    },
+    {
+        "id": 3,
+        "question": "Chính sách bảo hành công trình như thế nào?",
+        "answer": "Công ty bảo hành kết cấu 10 năm và bảo hành phần hoàn thiện 12 tháng kể từ ngày bàn giao."
+    }
+]
