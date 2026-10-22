@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NMK Architects Chatbot</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Khung chat chính -->
+  <main class="chat">
+    <!-- Header: logo + tên chatbot + trạng thái -->
+    <header class="chat__header">
+      <div class="chat__avatar" aria-hidden="true">NMK</div>
+      <div>
+        <h1 class="chat__title">NMK Architects</h1>
+        <p class="chat__subtitle">Tư vấn kiến trúc &amp; nội thất</p>
+      </div>
+    </header>
+
+    <!-- Danh sách tin nhắn, JS sẽ thêm tin nhắn mới vào đây -->
+    <section id="messages" class="chat__messages" aria-live="polite">
+      <div class="message message--bot">
+        <div class="message__bubble">Chào bạn! 👋 Mình là trợ lý của NMK Architects. Bạn muốn tìm hiểu về dự án, phong cách nội thất hay thông tin liên hệ nè?</div>
+      </div>
+    </section>
+
+    <!-- Câu hỏi gợi ý: bấm vào sẽ gửi luôn câu hỏi -->
+    <div id="suggestions" class="chat__suggestions">
+      <button type="button" class="suggestion">NMK có những phong cách nội thất nào?</button>
+      <button type="button" class="suggestion">Cho mình xem các dự án tiêu biểu</button>
+      <button type="button" class="suggestion">Thông tin liên hệ của công ty</button>
+    </div>
+
+    <!-- Ô nhập câu hỏi + nút gửi -->
+    <form id="chat-form" class="chat__form">
+      <textarea
+        id="question"
+        class="chat__input"
+        rows="1"
+        maxlength="1000"
+        placeholder="Nhập câu hỏi của bạn..."
+        aria-label="Câu hỏi"
+        required
+      ></textarea>
+      <button id="send" type="submit" class="chat__send" aria-label="Gửi">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path fill="currentColor" d="M3.4 20.4 21 12 3.4 3.6 3.4 10.2 15 12 3.4 13.8z"/>
+        </svg>
+      </button>
+    </form>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

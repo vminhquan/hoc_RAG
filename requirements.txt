@@ -18,3 +18,7 @@ qdrant-client
 # ===== LLM & Embedding (OpenAI) =====
 openai
 tiktoken
+
+# ===== Web API =====
+fastapi>=0.115
+uvicorn[standard]>=0.30

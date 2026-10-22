@@ -61,5 +61,25 @@ services:
       qdrant:
         condition: service_healthy
 
+  # Chatbot Web: giao dien hoi dap tai http://localhost:8000
+  # Chay: docker compose --profile web up web
+  web:
+    image: nmk-chatbot-app:latest
+    build: .
+    container_name: nmk-web
+    profiles: ["web"]
+    command: ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "8000:8000"
+    env_file: .env
+    environment:
+      QDRANT_URL: http://qdrant:6333
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+    depends_on:
+      qdrant:
+        condition: service_healthy
+
 volumes:
   qdrant_data:
