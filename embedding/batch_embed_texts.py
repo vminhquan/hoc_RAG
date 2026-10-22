@@ -25,4 +25,4 @@ def batch_embed_texts(texts: list[str]) -> list[list[float]]:
 
         logger.info(f"Processed batch {start // EMBEDDING_BATCH_SIZE + 1}: {len(batch)} texts.")
 
-        return all_embeddings
+    return all_embeddings

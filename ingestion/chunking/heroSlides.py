@@ -9,7 +9,7 @@ settings = load_settings()
 logger = logging.getLogger("ingestion")
 
 def chunk_hero_slides():
-    file_path = Path(settings(["data"]["priority_dir"])) / "heroSlides.json"
+    file_path = Path(settings["data"]["processed_dir"]) / "heroSlides.json"
 
     # Kiểm tra sự tồn tại của file trước khi mở
     if not file_path.exists():
@@ -55,92 +55,68 @@ def chunk_hero_slides():
             logger.info(f"Skipping inactive hero slide at index {idx}")
             continue
 
-        # name and slug are mandatory
-        hero_slide_title = hero_slide.get("title", "")
+        # title la bat buoc
+        hero_slide_title = hero_slide.get("title") or ""
         if not hero_slide_title or not isinstance(hero_slide_title, str):
             logger.warning(f"Skipping hero slide with missing title at index {idx}")
             continue
 
-        hero_slide_subtitle = hero_slide.get("subtitle", "")
-        if not hero_slide_subtitle or not isinstance(hero_slide_subtitle, str):
-            logger.warning(f"Skipping hero slide with missing subtitle at index {idx}")
-            continue
+        # cac truong con lai co the null
+        hero_slide_subtitle = hero_slide.get("subtitle") or ""
+        if not isinstance(hero_slide_subtitle, str):
+            logger.warning(f"Invalid subtitle for hero slide at index {idx}, ignored")
+            hero_slide_subtitle = ""
 
-        hero_slide_description = hero_slide.get("description", "")
-        if not hero_slide_description or not isinstance(hero_slide_description, str):
-            logger.warning(f"Skipping hero slide with missing description at index {idx}")
-            continue
+        hero_slide_description = hero_slide.get("description") or ""
+        if not isinstance(hero_slide_description, str):
+            logger.warning(f"Invalid description for hero slide at index {idx}, ignored")
+            hero_slide_description = ""
 
-        hero_slide_image = hero_slide.get("image", "")
-        if not hero_slide_image or not isinstance(hero_slide_image, str):
-            logger.warning(f"Skipping hero slide with missing image at index {idx}")
-            continue
-
-        hero_slide_video = hero_slide.get("video", "")
-
-        hero_slide_page = hero_slide.get("page", "")
-        if not hero_slide_page or not isinstance(hero_slide_page, str):
-            logger.warning(f"Skipping hero slide with missing page at index {idx}")
-            continue
+        hero_slide_page = hero_slide.get("page") or ""
+        if not isinstance(hero_slide_page, str):
+            logger.warning(f"Invalid page for hero slide at index {idx}, ignored")
+            hero_slide_page = ""
 
         hero_slide_order = hero_slide.get("order", 0)
         if not isinstance(hero_slide_order, int):
             logger.warning(f"Invalid order for hero slide at index {idx}, defaulting to 0")
             hero_slide_order = 0
 
-        hero_slide_isActive = hero_slide.get("isActive", True)
-        if not isinstance(hero_slide_isActive, bool):
-            logger.warning(f"Invalid isActive for hero slide at index {idx}, defaulting to True")
-            hero_slide_isActive = True
+        hero_slide_imageUrl = hero_slide.get("imageUrl") or ""
+        hero_slide_imageAlt = hero_slide.get("imageAlt") or ""
+        hero_slide_videoUrl = hero_slide.get("videoUrl") or ""
+        hero_slide_videoTitle = hero_slide.get("videoTitle") or ""
 
-        hero_slide_imageAlt = hero_slide.get("imageAlt", "")
-        if not isinstance(hero_slide_imageAlt, str):
-            logger.warning(f"Invalid imageAlt for hero slide at index {idx}, defaulting to empty string")
-            hero_slide_imageAlt = ""
+        text_parts = [
+            f"Tiêu đề: {hero_slide_title}",
+            f"Tiêu đề phụ: {hero_slide_title}: {hero_slide_subtitle}" if hero_slide_subtitle else "",
+            f"Mô tả: {hero_slide_title}: {hero_slide_description}" if hero_slide_description else "",
+            f"Trang: {hero_slide_title}: {hero_slide_page}" if hero_slide_page else "",
+        ]
 
-        hero_slide_videoTitle = hero_slide.get("videoTitle", "")
+        text = "\n".join(filter(None, text_parts))
 
-        hero_slide_createdAt = hero_slide.get("createdAt", "")
-        hero_slide_updatedAt = hero_slide.get("updatedAt", "")
+        chunks.append(
+            {
+                "text": text,
+                "metadata": {
+                    "type": "hero_slide",
+                    "source": "heroSlides.json",
+                    "hero_slide_id": hero_slide_id,
+                    "hero_slide_title": hero_slide_title,
+                    "hero_slide_subtitle": hero_slide_subtitle,
+                    "hero_slide_page": hero_slide_page,
+                    "hero_slide_order": hero_slide_order,
+                    "hero_slide_imageUrl": hero_slide_imageUrl,
+                    "hero_slide_imageAlt": hero_slide_imageAlt,
+                    "hero_slide_videoUrl": hero_slide_videoUrl,
+                    "hero_slide_videoTitle": hero_slide_videoTitle,
+                },
+            }
+        )
 
-    text_paths = [
-        f"Tiêu đề: {hero_slide_title}",
-        f"Tiêu đề phụ: {hero_slide_subtitle}",
-        f"Mô tả: {hero_slide_description}",
-        f"Hình ảnh: {hero_slide_image}",
-        f"Video: {hero_slide_video}" if hero_slide_video else "",
-        f"Trang: {hero_slide_page}",
-        f"Thứ tự: {hero_slide_order}",
-        f"Đang hiển thị: {hero_slide_isActive}",
-        f"Mô tả hình ảnh: {hero_slide_imageAlt}" if hero_slide_imageAlt else "",
-        f"Tiêu đề video: {hero_slide_videoTitle}" if hero_slide_videoTitle else "",
-        f"Ngày tạo: {hero_slide_createdAt}" if hero_slide_createdAt else "",
-        f"Ngày cập nhật: {hero_slide_updatedAt}" if hero_slide_updatedAt else "",
-    ]
-
-    text = "\n".join(filter(None, text_paths))  # Join non-empty parts
-
-    chunks.append(
-        {
-        "text": "\n".join(filter(None, text_paths)),
-        "metadata": {
-            "id": hero_slide_id,
-            "title": hero_slide_title,
-            "subtitle": hero_slide_subtitle,
-            "description": hero_slide_description,
-            "image": hero_slide_image,
-            "video": hero_slide_video,
-            "page": hero_slide_page,
-            "order": hero_slide_order,
-            "isActive": hero_slide_isActive,
-            "imageAlt": hero_slide_imageAlt,
-            "videoTitle": hero_slide_videoTitle,
-            "createdAt": hero_slide_createdAt,
-            "updatedAt": hero_slide_updatedAt
-        }
-    }
-    )
     if not chunks:
         logger.warning(f"No chunks created for hero slides from {file_path}")
 
+    logger.info(f"Created {len(chunks)} chunks for hero slides")
     return chunks

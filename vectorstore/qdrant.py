@@ -18,11 +18,17 @@ VECTOR_DB_VECTOR_SIZE = VECTOR_DB_SETTINGS.get("vector_size", 1024)
 VECTOR_DB_TIMEOUT = VECTOR_DB_SETTINGS.get("timeout", 30)  # seconds
 VECTOR_DB_DISTANCE = VECTOR_DB_SETTINGS.get("distance", "cosine")  # cosine | dot | euclid
 
+DISTANCES = {
+    "cosine": Distance.COSINE,
+    "dot": Distance.DOT,
+    "euclid": Distance.EUCLID,
+}
+
 _client = None
 
 def get_qdrant_client() -> QdrantClient:
     global _client
-    if _client is None:
+    if _client is not None:
         return _client
 
     try:
@@ -55,18 +61,18 @@ def get_qdrant_client() -> QdrantClient:
 def ensure_collection(client: QdrantClient):
     existing_collections = [col.name for col in client.get_collections().collections]
 
-    if VECTOR_DB_COLLECTION not in existing_collections:
+    if VECTOR_DB_COLLECTION in existing_collections:
         logger.info(f"Collection '{VECTOR_DB_COLLECTION}' already exists.")
         return
 
     logger.info(f"Creating collection '{VECTOR_DB_COLLECTION}' with distance metric '{VECTOR_DB_DISTANCE}'")
 
-    client.recreate_collection(
+    client.create_collection(
         collection_name=VECTOR_DB_COLLECTION,
-        vectors_config={
-            "size": VECTOR_DB_VECTOR_SIZE,
-            "distance": VECTOR_DB_DISTANCE
-        }
+        vectors_config=VectorParams(
+            size=VECTOR_DB_VECTOR_SIZE,
+            distance=DISTANCES[VECTOR_DB_DISTANCE],
+        ),
     )
 
     logger.info(f"Collection '{VECTOR_DB_COLLECTION}' created successfully with distance metric '{VECTOR_DB_DISTANCE}'")
