@@ -22,7 +22,11 @@ def embed_texts(texts: list[str]) -> list[list[float]]: # {"Câu văn 1"} = {[0.
         return []
 
     client = get_client()
-    response = client.embeddings.create(model=EMBEDDING_MODEL, input=texts)
+    try:
+        response = client.embeddings.create(model=EMBEDDING_MODEL, input=texts)
+    except Exception as e:
+        logger.error(f"Embedding failed (model={EMBEDDING_MODEL}): {e}")
+        raise
     embeddings = [item.embedding for item in sorted(response.data, key=lambda item: item.index)]
     logger.info(f"Generated embeddings for {len(texts)} texts.")
     return embeddings
